@@ -1,10 +1,11 @@
-import Node from './Node';
+import Node from './Node.js';
 
-export default class {
+export default class Tree {
   #root = null;
 
   constructor(arr) {
-    this.root = this.buildTree(this.sortArray(arr));
+    const sortedArray = [...new Set(arr)].sort();
+    this.root = this.buildTree(sortedArray, 0, sortedArray.length - 1);
   }
 
   get root() {
@@ -15,17 +16,30 @@ export default class {
     this.#root = node;
   }
 
-  static sortArray(arr) {
-    const sortedArr = [...new Set(arr)].sort();
-    return sortedArr;
-  }
+  buildTree(sortedArr, start, end) {
+    if (start > end) {
+      return null;
+    }
 
-  static buildTree(sortedArr, start, end) {
-    const mid = Math.floor(start + end) / 2;
+    const mid = Math.floor((start + end) / 2);
     const root = new Node(sortedArr[mid]);
-    root.left = this.buildTree(sortedArr, start, mid + 1);
+    root.left = this.buildTree(sortedArr, start, mid - 1);
     root.right = this.buildTree(sortedArr, mid + 1, end);
 
     return root;
+  }
+
+  prettyPrint(node, prefix = '', isLeft = true) {
+    if (node.right !== null) {
+      this.prettyPrint(
+        node.right,
+        `${prefix}${isLeft ? '│   ' : '    '}`,
+        false,
+      );
+    }
+    console.log(`${prefix}${isLeft ? '└── ' : '┌── '}${node.data}`);
+    if (node.left !== null) {
+      this.prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
+    }
   }
 }

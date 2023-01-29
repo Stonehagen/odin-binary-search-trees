@@ -5,12 +5,12 @@ export default class {
 
   #right = null;
 
-  constructor(data) {
-    this.data = data;
+  constructor(newData) {
+    this.data = newData;
   }
 
-  set data(data) {
-    this.#data = data;
+  set data(newData) {
+    this.#data = newData;
   }
 
   get data() {
