@@ -64,8 +64,7 @@ export default class Tree {
   }
 
   delete(data) {
-    const delNode = this.getNode(data);
-    const prevNode = this.getParentNode(data);
+    const delNode = this.find(data);
     if (delNode === null) {
       return false;
     }
@@ -73,38 +72,39 @@ export default class Tree {
       return this.deleteRootNode(delNode);
     }
     if (this.hasNoChild(delNode)) {
-      return this.deleteNodeWithoutChild(prevNode, data);
+      return this.deleteNodeWithoutChild(delNode);
     }
     if (this.hasOnlyOneChild(delNode)) {
-      return this.deleteNodeWithOneChild(prevNode, delNode);
+      return this.deleteNodeWithOneChild(delNode);
     }
     return false;
   }
 
   deleteRootNode(delNode) {
     const lowestNodeData = this.getInorderSuccessor(delNode).data;
-
     this.delete(lowestNodeData);
     delNode.data = lowestNodeData;
   }
 
-  deleteNodeWithoutChild(prevNode, data) {
-    const parentNodeDirection = this.getParentDirection(prevNode, data);
+  deleteNodeWithoutChild(delNode) {
+    const parentNode = this.getParentNode(delNode.data);
+    const parentNodeDirection = this.getParentDirection(parentNode, delNode.data);
     if (parentNodeDirection === 'r') {
-      prevNode.right = null;
+      parentNode.right = null;
       return true;
     }
-    prevNode.left = null;
+    parentNode.left = null;
     return true;
   }
 
-  deleteNodeWithOneChild(prevNode, delNode) {
-    const parentNodeDirection = this.getParentDirection(prevNode, delNode.data);
+  deleteNodeWithOneChild(delNode) {
+    const parentNode = this.getParentNode(delNode.data);
+    const parentNodeDirection = this.getParentDirection(parentNode, delNode.data);
     if (parentNodeDirection === 'r') {
-      prevNode.right = delNode.left === null ? delNode.right : delNode.left;
+      parentNode.right = delNode.left === null ? delNode.right : delNode.left;
       return true;
     }
-    prevNode.left = delNode.right === null ? delNode.left : delNode.right;
+    parentNode.left = delNode.right === null ? delNode.left : delNode.right;
     return true;
   }
 
@@ -154,7 +154,7 @@ export default class Tree {
     return this.getParentNode(data, node.left);
   }
 
-  getNode(data, node = this.root) {
+  find(data, node = this.root) {
     if (node === null) {
       return null;
     }
@@ -162,9 +162,9 @@ export default class Tree {
       return node;
     }
     if (node.data <= data) {
-      return this.getNode(data, node.right);
+      return this.find(data, node.right);
     }
-    return this.getNode(data, node.left);
+    return this.find(data, node.left);
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
