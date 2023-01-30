@@ -46,6 +46,19 @@ export default class Tree {
     }
   }
 
+  getPrevDir(prNode, data) {
+    if (prNode.left === null) {
+      return 'r';
+    }
+    if (prNode.right === null) {
+      return 'l';
+    }
+    if (prNode.left.data === data) {
+      return 'l';
+    }
+    return 'r';
+  }
+
   delete(data) {
     const delNode = this.find(data);
     const prevNode = this.findPrev(data);
@@ -56,22 +69,30 @@ export default class Tree {
       // Node is root Node
     }
     if (delNode.left === null && delNode.right === null) {
-      if (prevNode.left === null) {
+      const prevNodeDirection = this.getPrevDir(prevNode, data);
+      if (prevNodeDirection === 'r') {
         prevNode.right = null;
         return true;
       }
-      if (prevNode.right === null) {
+      if (prevNodeDirection === 'l') {
         prevNode.left = null;
         return true;
       }
-      if (prevNode.left.data === data) {
-        prevNode.left = null;
+    }
+    if (delNode.left === null || delNode.right === null) {
+      const prevNodeDirection = this.getPrevDir(prevNode, data);
+      if (prevNodeDirection === 'r') {
+        prevNode.right = delNode.left === null ? delNode.right : delNode.left;
         return true;
       }
-      prevNode.right = null;
-      return true;
+      if (prevNodeDirection === 'l') {
+        prevNode.left = delNode.right === null ? delNode.left : delNode.right;
+        return true;
+      }
     }
   }
+
+
 
   findPrev(data, node = this.root) {
     if (node === null) {
