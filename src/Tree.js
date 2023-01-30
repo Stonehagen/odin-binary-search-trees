@@ -35,6 +35,14 @@ export default class Tree {
     );
   }
 
+  #hasLeftChild(node) {
+    return node.left !== null;
+  }
+
+  #hasRightChild(node) {
+    return node.right !== null;
+  }
+
   #buildTree(sortedArr, start, end) {
     if (start > end) {
       return null;
@@ -125,14 +133,6 @@ export default class Tree {
       return node;
     }
     return this.#getParentNode(data, node.left);
-  }
-
-  #hasLeftChild(node) {
-    return node.left !== null;
-  }
-
-  #hasRightChild(node) {
-    return node.right !== null;
   }
 
   insert(data, node = this.root) {
@@ -280,6 +280,28 @@ export default class Tree {
     }
 
     return values;
+  }
+
+  height(h, node = this.root) {
+    if (h === undefined) {
+      h = 0;
+    } else {
+      h += 1;
+    }
+    if (this.#hasNoChild(node)) {
+      return h;
+    }
+
+    let hLeft = 0;
+    let hRight = 0;
+    if (this.#hasLeftChild(node)) {
+      hLeft = this.height(h, node.left);
+    }
+    if (this.#hasRightChild(node)) {
+      hRight = this.height(h, node.right);
+    }
+
+    return hRight > hLeft ? hRight : hLeft;
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
