@@ -6,4 +6,7 @@ const newTree = new Tree([
   91, 89, 95, 31,
 ]);
 
+newTree.postorder((node) => {
+  console.log(node.data);
+});
 newTree.prettyPrint(newTree.root);

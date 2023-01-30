@@ -127,6 +127,14 @@ export default class Tree {
     return this.#getParentNode(data, node.left);
   }
 
+  #hasLeftChild(node) {
+    return node.left !== null;
+  }
+
+  #hasRightChild(node) {
+    return node.right !== null;
+  }
+
   insert(data, node = this.root) {
     if (data <= node.data) {
       if (node.left === null) {
@@ -181,7 +189,6 @@ export default class Tree {
       stack = [this.root];
     }
 
-    console.log(stack);
     const newStack = [];
     let values = [];
     stack.forEach((node) => {
@@ -199,6 +206,79 @@ export default class Tree {
     if (newStack.length !== 0) {
       values = values.concat(this.levelOrder(newStack, callback));
     }
+    return values;
+  }
+
+  inorder(node, callback) {
+    if (typeof node === 'function') {
+      callback = node;
+      node = this.root;
+    } else if (node === undefined) {
+      node = this.root;
+    }
+
+    let values = [];
+    if (this.#hasLeftChild(node)) {
+      values = values.concat(this.inorder(node.left, callback));
+    }
+
+    values.push(node.data);
+    if (callback) {
+      callback(node);
+    }
+
+    if (this.#hasRightChild(node)) {
+      values = values.concat(this.inorder(node.right, callback));
+    }
+    return values;
+  }
+
+  preorder(node, callback) {
+    if (typeof node === 'function') {
+      callback = node;
+      node = this.root;
+    } else if (node === undefined) {
+      node = this.root;
+    }
+    let values = [];
+
+    values.push(node.data);
+    if (callback) {
+      callback(node);
+    }
+
+    if (this.#hasLeftChild(node)) {
+      values = values.concat(this.preorder(node.left, callback));
+    }
+
+    if (this.#hasRightChild(node)) {
+      values = values.concat(this.preorder(node.right, callback));
+    }
+
+    return values;
+  }
+
+  postorder(node, callback) {
+    if (typeof node === 'function') {
+      callback = node;
+      node = this.root;
+    } else if (node === undefined) {
+      node = this.root;
+    }
+    let values = [];
+    if (this.#hasLeftChild(node)) {
+      values = values.concat(this.postorder(node.left, callback));
+    }
+
+    if (this.#hasRightChild(node)) {
+      values = values.concat(this.postorder(node.right, callback));
+    }
+
+    values.push(node.data);
+    if (callback) {
+      callback(node);
+    }
+
     return values;
   }
 
