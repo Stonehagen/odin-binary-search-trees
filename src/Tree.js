@@ -9,7 +9,7 @@ export default class Tree {
 
   constructor(arr) {
     const sortedArray = [...new Set(arr)].sort((a, b) => a - b);
-    this.root = this.buildTree(sortedArray, 0, sortedArray.length - 1);
+    this.root = this.#buildTree(sortedArray, 0, sortedArray.length - 1);
   }
 
   get root() {
@@ -20,31 +20,111 @@ export default class Tree {
     this.#root = node;
   }
 
-  hasNoChild(node) {
+  #hasNoChild(node) {
     return node.left === null && node.right === null;
   }
 
-  hasTwoChildren(node) {
+  #hasTwoChildren(node) {
     return node.left !== null && node.right !== null;
   }
 
-  hasOnlyOneChild(node) {
+  #hasOnlyOneChild(node) {
     return (
       (node.left === null && node.right !== null) ||
       (node.left !== null && node.right === null)
     );
   }
 
-  buildTree(sortedArr, start, end) {
+  #buildTree(sortedArr, start, end) {
     if (start > end) {
       return null;
     }
     const mid = Math.floor((start + end) / 2);
     const root = new Node(sortedArr[mid]);
-    root.left = this.buildTree(sortedArr, start, mid - 1);
-    root.right = this.buildTree(sortedArr, mid + 1, end);
+    root.left = this.#buildTree(sortedArr, start, mid - 1);
+    root.right = this.#buildTree(sortedArr, mid + 1, end);
 
     return root;
+  }
+
+  #deleteRootNode(delNode) {
+    const lowestNodeData = this.#getInorderSuccessor(delNode).data;
+    this.delete(lowestNodeData);
+    delNode.data = lowestNodeData;
+  }
+
+  #deleteNodeWithoutChild(delNode) {
+    const parentNode = this.#getParentNode(delNode.data);
+    const parentNodeDirection = this.#getParentDirection(
+      parentNode,
+      delNode.data,
+    );
+    if (parentNodeDirection === 'r') {
+      parentNode.right = null;
+      return true;
+    }
+    parentNode.left = null;
+    return true;
+  }
+
+  #deleteNodeWithOneChild(delNode) {
+    const parentNode = this.#getParentNode(delNode.data);
+    const parentNodeDirection = this.#getParentDirection(
+      parentNode,
+      delNode.data,
+    );
+    if (parentNodeDirection === 'r') {
+      parentNode.right = delNode.left === null ? delNode.right : delNode.left;
+      return true;
+    }
+    parentNode.left = delNode.right === null ? delNode.left : delNode.right;
+    return true;
+  }
+
+  #getInorderSuccessor(node) {
+    if (node.right === null) {
+      return null;
+    }
+    return this.#getMostLeftChild(node.right);
+  }
+
+  #getMostLeftChild(node) {
+    if (node.left === null) {
+      return node;
+    }
+    return this.#getMostLeftChild(node.left);
+  }
+
+  #getParentDirection(prNode, data) {
+    if (prNode.left === null) {
+      return 'r';
+    }
+    if (prNode.right === null) {
+      return 'l';
+    }
+    if (prNode.left.data === data) {
+      return 'l';
+    }
+    return 'r';
+  }
+
+  #getParentNode(data, node = this.root) {
+    if (node === null) {
+      return null;
+    }
+    if (node.data === data) {
+      return 'root';
+    }
+    if (node.data <= data) {
+      if (node.right.data === data) {
+        return node;
+      }
+      return this.#getParentNode(data, node.right);
+    }
+    if (node.left.data === data) {
+      return node;
+    }
+    return this.#getParentNode(data, node.left);
   }
 
   insert(data, node = this.root) {
@@ -68,90 +148,16 @@ export default class Tree {
     if (delNode === null) {
       return false;
     }
-    if (this.hasTwoChildren(delNode)) {
-      return this.deleteRootNode(delNode);
+    if (this.#hasTwoChildren(delNode)) {
+      return this.#deleteRootNode(delNode);
     }
-    if (this.hasNoChild(delNode)) {
-      return this.deleteNodeWithoutChild(delNode);
+    if (this.#hasNoChild(delNode)) {
+      return this.#deleteNodeWithoutChild(delNode);
     }
-    if (this.hasOnlyOneChild(delNode)) {
-      return this.deleteNodeWithOneChild(delNode);
+    if (this.#hasOnlyOneChild(delNode)) {
+      return this.#deleteNodeWithOneChild(delNode);
     }
     return false;
-  }
-
-  deleteRootNode(delNode) {
-    const lowestNodeData = this.getInorderSuccessor(delNode).data;
-    this.delete(lowestNodeData);
-    delNode.data = lowestNodeData;
-  }
-
-  deleteNodeWithoutChild(delNode) {
-    const parentNode = this.getParentNode(delNode.data);
-    const parentNodeDirection = this.getParentDirection(parentNode, delNode.data);
-    if (parentNodeDirection === 'r') {
-      parentNode.right = null;
-      return true;
-    }
-    parentNode.left = null;
-    return true;
-  }
-
-  deleteNodeWithOneChild(delNode) {
-    const parentNode = this.getParentNode(delNode.data);
-    const parentNodeDirection = this.getParentDirection(parentNode, delNode.data);
-    if (parentNodeDirection === 'r') {
-      parentNode.right = delNode.left === null ? delNode.right : delNode.left;
-      return true;
-    }
-    parentNode.left = delNode.right === null ? delNode.left : delNode.right;
-    return true;
-  }
-
-  getInorderSuccessor(node) {
-    if (node.right === null) {
-      return null;
-    }
-    return this.getMostLeftChild(node.right);
-  }
-
-  getMostLeftChild(node) {
-    if (node.left === null) {
-      return node;
-    }
-    return this.getMostLeftChild(node.left);
-  }
-
-  getParentDirection(prNode, data) {
-    if (prNode.left === null) {
-      return 'r';
-    }
-    if (prNode.right === null) {
-      return 'l';
-    }
-    if (prNode.left.data === data) {
-      return 'l';
-    }
-    return 'r';
-  }
-
-  getParentNode(data, node = this.root) {
-    if (node === null) {
-      return null;
-    }
-    if (node.data === data) {
-      return 'root';
-    }
-    if (node.data <= data) {
-      if (node.right.data === data) {
-        return node;
-      }
-      return this.getParentNode(data, node.right);
-    }
-    if (node.left.data === data) {
-      return node;
-    }
-    return this.getParentNode(data, node.left);
   }
 
   find(data, node = this.root) {
@@ -165,6 +171,35 @@ export default class Tree {
       return this.find(data, node.right);
     }
     return this.find(data, node.left);
+  }
+
+  levelOrder(stack, callback) {
+    if (typeof stack === 'function') {
+      callback = stack;
+      stack = [this.root];
+    } else if (stack === undefined) {
+      stack = [this.root];
+    }
+
+    console.log(stack);
+    const newStack = [];
+    let values = [];
+    stack.forEach((node) => {
+      if (callback) {
+        callback(node);
+      }
+      values.push(node.data);
+      if (node.left !== null) {
+        newStack.push(node.left);
+      }
+      if (node.right !== null) {
+        newStack.push(node.right);
+      }
+    });
+    if (newStack.length !== 0) {
+      values = values.concat(this.levelOrder(newStack, callback));
+    }
+    return values;
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
