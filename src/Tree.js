@@ -1,3 +1,5 @@
+/* eslint-disable operator-linebreak */
+/* eslint-disable class-methods-use-this */
 /* eslint-disable import/extensions */
 /* eslint-disable no-param-reassign */
 import Node from './Node.js';
@@ -16,6 +18,21 @@ export default class Tree {
 
   set root(node) {
     this.#root = node;
+  }
+
+  hasNoChild(node) {
+    return node.left === null && node.right === null;
+  }
+
+  hasTwoChildren(node) {
+    return node.left !== null && node.right !== null;
+  }
+
+  hasOnlyOneChild(node) {
+    return (
+      (node.left === null && node.right !== null) ||
+      (node.left !== null && node.right === null)
+    );
   }
 
   buildTree(sortedArr, start, end) {
@@ -46,7 +63,66 @@ export default class Tree {
     }
   }
 
-  getPrevDir(prNode, data) {
+  delete(data) {
+    const delNode = this.getNode(data);
+    const prevNode = this.getParentNode(data);
+    if (delNode === null) {
+      return false;
+    }
+    if (this.hasTwoChildren(delNode)) {
+      return this.deleteRootNode(delNode);
+    }
+    if (this.hasNoChild(delNode)) {
+      return this.deleteNodeWithoutChild(prevNode, data);
+    }
+    if (this.hasOnlyOneChild(delNode)) {
+      return this.deleteNodeWithOneChild(prevNode, delNode);
+    }
+    return false;
+  }
+
+  deleteRootNode(delNode) {
+    const lowestNodeData = this.getInorderSuccessor(delNode).data;
+
+    this.delete(lowestNodeData);
+    delNode.data = lowestNodeData;
+  }
+
+  deleteNodeWithoutChild(prevNode, data) {
+    const parentNodeDirection = this.getParentDirection(prevNode, data);
+    if (parentNodeDirection === 'r') {
+      prevNode.right = null;
+      return true;
+    }
+    prevNode.left = null;
+    return true;
+  }
+
+  deleteNodeWithOneChild(prevNode, delNode) {
+    const parentNodeDirection = this.getParentDirection(prevNode, delNode.data);
+    if (parentNodeDirection === 'r') {
+      prevNode.right = delNode.left === null ? delNode.right : delNode.left;
+      return true;
+    }
+    prevNode.left = delNode.right === null ? delNode.left : delNode.right;
+    return true;
+  }
+
+  getInorderSuccessor(node) {
+    if (node.right === null) {
+      return null;
+    }
+    return this.getMostLeftChild(node.right);
+  }
+
+  getMostLeftChild(node) {
+    if (node.left === null) {
+      return node;
+    }
+    return this.getMostLeftChild(node.left);
+  }
+
+  getParentDirection(prNode, data) {
     if (prNode.left === null) {
       return 'r';
     }
@@ -59,42 +135,7 @@ export default class Tree {
     return 'r';
   }
 
-  delete(data) {
-    const delNode = this.find(data);
-    const prevNode = this.findPrev(data);
-    if (delNode === null) {
-      return false;
-    }
-    if (this.findPrev(data) === 'root') {
-      // Node is root Node
-    }
-    if (delNode.left === null && delNode.right === null) {
-      const prevNodeDirection = this.getPrevDir(prevNode, data);
-      if (prevNodeDirection === 'r') {
-        prevNode.right = null;
-        return true;
-      }
-      if (prevNodeDirection === 'l') {
-        prevNode.left = null;
-        return true;
-      }
-    }
-    if (delNode.left === null || delNode.right === null) {
-      const prevNodeDirection = this.getPrevDir(prevNode, data);
-      if (prevNodeDirection === 'r') {
-        prevNode.right = delNode.left === null ? delNode.right : delNode.left;
-        return true;
-      }
-      if (prevNodeDirection === 'l') {
-        prevNode.left = delNode.right === null ? delNode.left : delNode.right;
-        return true;
-      }
-    }
-  }
-
-
-
-  findPrev(data, node = this.root) {
+  getParentNode(data, node = this.root) {
     if (node === null) {
       return null;
     }
@@ -105,15 +146,15 @@ export default class Tree {
       if (node.right.data === data) {
         return node;
       }
-      return this.findPrev(data, node.right);
+      return this.getParentNode(data, node.right);
     }
     if (node.left.data === data) {
       return node;
     }
-    return this.findPrev(data, node.left);
+    return this.getParentNode(data, node.left);
   }
 
-  find(data, node = this.root) {
+  getNode(data, node = this.root) {
     if (node === null) {
       return null;
     }
@@ -121,9 +162,9 @@ export default class Tree {
       return node;
     }
     if (node.data <= data) {
-      return this.find(data, node.right);
+      return this.getNode(data, node.right);
     }
-    return this.find(data, node.left);
+    return this.getNode(data, node.left);
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
