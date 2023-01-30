@@ -30,20 +30,79 @@ export default class Tree {
     return root;
   }
 
-  insert(newData, node = this.root) {
-    if (newData <= node.data) {
+  insert(data, node = this.root) {
+    if (data <= node.data) {
       if (node.left === null) {
-        node.left = new Node(newData);
+        node.left = new Node(data);
         return;
       }
-      this.insert(newData, node.left);
+      this.insert(data, node.left);
     } else {
       if (node.right === null) {
-        node.right = new Node(newData);
+        node.right = new Node(data);
         return;
       }
-      this.insert(newData, node.right);
+      this.insert(data, node.right);
     }
+  }
+
+  delete(data) {
+    const delNode = this.find(data);
+    const prevNode = this.findPrev(data);
+    if (delNode === null) {
+      return false;
+    }
+    if (this.findPrev(data) === 'root') {
+      // Node is root Node
+    }
+    if (delNode.left === null && delNode.right === null) {
+      if (prevNode.left === null) {
+        prevNode.right = null;
+        return true;
+      }
+      if (prevNode.right === null) {
+        prevNode.left = null;
+        return true;
+      }
+      if (prevNode.left.data === data) {
+        prevNode.left = null;
+        return true;
+      }
+      prevNode.right = null;
+      return true;
+    }
+  }
+
+  findPrev(data, node = this.root) {
+    if (node === null) {
+      return null;
+    }
+    if (node.data === data) {
+      return 'root';
+    }
+    if (node.data <= data) {
+      if (node.right.data === data) {
+        return node;
+      }
+      return this.findPrev(data, node.right);
+    }
+    if (node.left.data === data) {
+      return node;
+    }
+    return this.findPrev(data, node.left);
+  }
+
+  find(data, node = this.root) {
+    if (node === null) {
+      return null;
+    }
+    if (node.data === data) {
+      return node;
+    }
+    if (node.data <= data) {
+      return this.find(data, node.right);
+    }
+    return this.find(data, node.left);
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
