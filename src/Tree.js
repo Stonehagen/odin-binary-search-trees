@@ -304,6 +304,11 @@ export default class Tree {
     return hRight > hLeft ? hRight : hLeft;
   }
 
+  rebalance() {
+    const sortedArray = this.inorder();
+    this.root = this.#buildTree(sortedArray, 0, sortedArray.length - 1);
+  }
+
   prettyPrint(node, prefix = '', isLeft = true) {
     if (node.right !== null) {
       this.prettyPrint(

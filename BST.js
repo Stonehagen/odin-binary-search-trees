@@ -6,5 +6,14 @@ const newTree = new Tree([
   91, 89, 95, 31, 63, 64, 65, 78, 89, 47, 48, 40, 82, 84, 85,
 ]);
 
-console.log(newTree.height());
+newTree.insert(1.1);
+newTree.insert(1.2);
+newTree.insert(1.3);
+newTree.insert(1.4);
+newTree.insert(1.5);
+newTree.insert(1.6);
+newTree.insert(1.7);
+newTree.insert(1.8);
+newTree.insert(1.9);
+newTree.rebalance();
 newTree.prettyPrint(newTree.root);
