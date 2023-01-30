@@ -1,3 +1,5 @@
+/* eslint-disable import/extensions */
+/* eslint-disable no-param-reassign */
 import Node from './Node.js';
 
 export default class Tree {
@@ -26,6 +28,22 @@ export default class Tree {
     root.right = this.buildTree(sortedArr, mid + 1, end);
 
     return root;
+  }
+
+  insert(newData, node = this.root) {
+    if (newData <= node.data) {
+      if (node.left === null) {
+        node.left = new Node(newData);
+        return;
+      }
+      this.insert(newData, node.left);
+    } else {
+      if (node.right === null) {
+        node.right = new Node(newData);
+        return;
+      }
+      this.insert(newData, node.right);
+    }
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
