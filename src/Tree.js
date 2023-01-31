@@ -135,6 +135,18 @@ export default class Tree {
     return this.#getParentNode(data, node.left);
   }
 
+  #getEndNode(node, callback) {
+    if (this.#hasNoChild(node)) {
+      callback(node);
+    }
+    if (this.#hasLeftChild(node)) {
+      this.#getEndNode(node.left, callback);
+    }
+    if (this.#hasRightChild(node)) {
+      this.#getEndNode(node.right, callback);
+    }
+  }
+
   insert(data, node = this.root) {
     if (data <= node.data) {
       if (node.left === null) {
@@ -330,6 +342,24 @@ export default class Tree {
   rebalance() {
     const sortedArray = this.inorder();
     this.root = this.#buildTree(sortedArray, 0, sortedArray.length - 1);
+  }
+
+  isBalanced() {
+    const endNodes = [];
+    this.#getEndNode(this.root, (endNode) => {
+      endNodes.push(this.depth(endNode));
+    });
+    const nodeDepths = [...new Set(endNodes)].sort();
+    if (nodeDepths.length > 2) {
+      return false;
+    }
+    if (nodeDepths.length === 1) {
+      return true;
+    }
+    if (nodeDepths[0] + 1 === nodeDepths[1]) {
+      return true;
+    }
+    return false;
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {

@@ -7,4 +7,3 @@ const newTree = new Tree([
   91, 89, 95, 31, 63, 64, 65, 78, 89, 47, 48, 40, 82, 84, 85,
 ]);
 
-newTree.prettyPrint(newTree.root);
