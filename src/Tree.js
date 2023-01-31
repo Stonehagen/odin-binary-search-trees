@@ -304,6 +304,29 @@ export default class Tree {
     return hRight > hLeft ? hRight : hLeft;
   }
 
+  depth(node, data, dep) {
+    if (data === undefined) {
+      data = node.data;
+      node = this.root;
+    }
+    if (dep === undefined) {
+      dep = 0;
+    }
+    if (node === null) {
+      return dep - 1;
+    }
+
+    if (node.data === data) {
+      return dep;
+    }
+    if (node.data <= data) {
+      dep = this.depth(node.right, data, dep + 1);
+    } else if (node.data >= data) {
+      dep = this.depth(node.left, data, dep + 1);
+    }
+    return dep;
+  }
+
   rebalance() {
     const sortedArray = this.inorder();
     this.root = this.#buildTree(sortedArray, 0, sortedArray.length - 1);
